@@ -1,0 +1,14 @@
+pandas
+python-dotenv
+openai
+tavily-python
+duckduckgo-search
+gspread
+oauth2client
+newspaper3k
+lxml[html_clean]
+google-auth-oauthlib
+google-api-python-client
+fal-client
+beautifulsoup4
+requests
