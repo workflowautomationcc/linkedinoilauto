@@ -42,6 +42,7 @@ except ImportError:
 # Configuration from environment
 TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
 GOOGLE_SHEET_ID = os.getenv("GOOGLE_SHEET_ID")  # Optional, uses default if not set
+GOOGLE_TOKEN_JSON = os.getenv("GOOGLE_TOKEN_JSON")  # OAuth token JSON as string
 OUTPUT_TAB = "AI_Discovery"
 
 # Blocked domains (PR wires)
@@ -273,6 +274,24 @@ def run_discovery():
     except Exception as e:
         logger.error(f"Failed to initialize Tavily client: {e}")
         sys.exit(2)
+    
+    # Setup Google credentials for cloud execution
+    if GOOGLE_TOKEN_JSON:
+        # Write token JSON to temp file for DataManager
+        import tempfile
+        import json as json_lib
+        temp_token_file = tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False)
+        try:
+            # Parse and write the token JSON
+            token_data = json_lib.loads(GOOGLE_TOKEN_JSON)
+            json_lib.dump(token_data, temp_token_file)
+            temp_token_file.close()
+            # Set environment variable for DataManager
+            os.environ["GOOGLE_TOKEN_PATH"] = temp_token_file.name
+            logger.info("Google token configured from environment variable")
+        except Exception as e:
+            logger.error(f"Failed to parse GOOGLE_TOKEN_JSON: {e}")
+            sys.exit(2)
     
     # Initialize DataManager
     try:
